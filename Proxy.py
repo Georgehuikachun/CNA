@@ -40,7 +40,7 @@ except:
 try:
   # Listen on the server socket
   # ~~~~ INSERT CODE ~~~~
-  serverSocket.listen(1)
+  serverSocket.listen(2)
   # ~~~~ END CODE INSERT ~~~~
   print ('Listening to socket')
 except:
@@ -125,6 +125,7 @@ while True:
     print ('Sent to the client:')
     print ('> ' + cacheData)
   except:
+
     # cache miss.  Get resource from origin server
     originServerSocket = None
     # Create a socket to connect to origin server
@@ -150,6 +151,9 @@ while True:
       # originServerRequest is the first line in the request and
       # originServerRequestHeader is the second line in the request
       # ~~~~ INSERT CODE ~~~~
+      # GET xxxx HTTP/1.1
+      # Host: xxx
+      # Connection:close
       originServerRequest = f"GET {resource} HTTP/1.1"
       originServerRequestHeader = f"Host: {hostname}\r\nConnection: close"
       # ~~~~ END CODE INSERT ~~~~
@@ -172,10 +176,17 @@ while True:
 
       # Get the response from the origin server
       # ~~~~ INSERT CODE ~~~~
+      response = b""
+      while True:
+        data = originServerSocket.recv(BUFFER_SIZE)
+        if not data:
+            break
+        response += data
       # ~~~~ END CODE INSERT ~~~~
 
       # Send the response to the client
       # ~~~~ INSERT CODE ~~~~
+      clientSocket.sendall(response)
       # ~~~~ END CODE INSERT ~~~~
 
       # Create a new file in the cache for the requested file.
@@ -187,6 +198,7 @@ while True:
 
       # Save origin server response in the cache file
       # ~~~~ INSERT CODE ~~~~
+      cacheFile.write(response)
       # ~~~~ END CODE INSERT ~~~~
       cacheFile.close()
       print ('cache file closed')
