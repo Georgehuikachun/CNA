@@ -103,31 +103,39 @@ while True:
   # Check if resource is in cache
   try:
     cacheLocation = './' + hostname + resource
+    print(cacheLocation)
     if cacheLocation.endswith('/'):
         cacheLocation = cacheLocation + 'default'
 
     print ('Cache location:\t\t' + cacheLocation)
 
     fileExists = os.path.isfile(cacheLocation)
-    
+    #print(fileExists)
     # Check wether the file is currently in the cache
-    cacheFile = open(cacheLocation, "r")
-    cacheData = cacheFile.readlines()
 
-    print ('Cache hit! Loading from cache file: ' + cacheLocation)
-    # ProxyServer finds a cache hit
-    # Send back response to client 
-    # ~~~~ INSERT CODE ~~~~
-    for line in cacheData:
-      clientSocket.send(line.encode())
-    # ~~~~ END CODE INSERT ~~~~
-    cacheFile.close()
-    print ('Sent to the client:')
-    print ('> ' + cacheData)
+    # Additional if, otherwise the proxy will keep contact to origin server no matter cache file exists or not
+    print(fileExists)
+    if fileExists:
+      
+        cacheFile = open(cacheLocation, "r")
+        cacheData = cacheFile.readlines()
+
+        print ('Cache hit! Loading from cache file: ' + cacheLocation)
+        # ProxyServer finds a cache hit
+        # Send back response to client 
+        # ~~~~ INSERT CODE ~~~~
+        for line in cacheData:
+            clientSocket.sendall(line.encode('utf-8'))
+        print(1)
+        # ~~~~ END CODE INSERT ~~~~
+        cacheFile.close()
+        print ('Sent to the client:')
+        print ('> ' + cacheData)
   except:
 
     # cache miss.  Get resource from origin server
     originServerSocket = None
+    print('Cache miss!')
     # Create a socket to connect to origin server
     # and store in originServerSocket
     # ~~~~ INSERT CODE ~~~~
